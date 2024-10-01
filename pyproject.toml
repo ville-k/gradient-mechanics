@@ -9,3 +9,8 @@ dependencies = []
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "mkdocs-material>=9.5.39",
+]
