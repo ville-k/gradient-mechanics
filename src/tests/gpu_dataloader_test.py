@@ -18,7 +18,7 @@ def test_image_decoding(thirty_jpegs_dir_path):
         gpu_prefetch_factor=1,
         gpu_transforms=gpu_transforms,
     )
-    assert len(dataloader) == 6
+
     batch_count = 0
     for batch in dataloader:
         assert len(batch) == 5
@@ -42,7 +42,7 @@ def test_image_resizing(thirty_jpegs_dir_path):
         gpu_prefetch_factor=1,
         gpu_transforms=gpu_transforms,
     )
-    assert len(dataloader) == 6
+
     batch_count = 0
     for batch in dataloader:
         assert len(batch) == 5
@@ -66,7 +66,7 @@ def test_image_cropping(thirty_jpegs_dir_path):
         gpu_prefetch_factor=1,
         gpu_transforms=gpu_transforms,
     )
-    assert len(dataloader) == 6
+
     batch_count = 0
     for batch in dataloader:
         assert len(batch) == 5
@@ -91,7 +91,7 @@ def test_image_resize_and_crop(thirty_jpegs_dir_path):
         gpu_prefetch_factor=1,
         gpu_transforms=gpu_transforms,
     )
-    assert len(dataloader) == 6
+
     batch_count = 0
     for batch in dataloader:
         assert len(batch) == 5

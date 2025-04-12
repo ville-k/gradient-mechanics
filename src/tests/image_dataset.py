@@ -1,5 +1,5 @@
 import pathlib
-
+import os
 import torch
 from torchvision import io
 from gradient_mechanics.data import transforms
@@ -11,20 +11,20 @@ class EncodedImageDataset(torch.utils.data.Dataset):
     def __init__(self, image_dir: str):
         super().__init__()
         self.image_dir = image_dir
-        self._image_paths = None
-
-    def _lazy_init(self):
-        if self._image_paths is not None:
-            return
-
-        self._image_paths = list(pathlib.Path(self.image_dir).glob("*.[jpeg jpg]*"))
+        # Do initialization upfront rather than lazily
+        self._image_paths = sorted(
+            [path for path in pathlib.Path(image_dir).glob("*.jp*g") 
+             if os.path.isfile(path)]
+        )
 
     def __len__(self):
-        self._lazy_init()
         return len(self._image_paths)
 
     def __getitem__(self, index):
-        self._lazy_init()
-        image_path = self._image_paths[index]
-        image = io.read_file(str(image_path))
-        return transforms.EncodedImage(buffer=image)
+        try:
+            image_path = self._image_paths[index]
+            image = io.read_file(str(image_path))
+            return transforms.EncodedImage(buffer=image)
+        except Exception as e:
+            # Provide better error information
+            raise RuntimeError(f"Error reading image at index {index}, path {self._image_paths[index]}: {str(e)}")

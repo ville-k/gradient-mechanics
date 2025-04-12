@@ -60,7 +60,6 @@ if __name__ == "__main__":
         print(f"Batch: {i} - {len(batch)} frames in {load_gaps[-1]:.4f} seconds")
         batches_loaded += 1
         for sample in batch:
-            print(f"Frame: {sample.shape}")
             samples_loaded += sample.shape[0]
 
     ended_at = time.perf_counter()
@@ -78,3 +77,4 @@ if __name__ == "__main__":
     print(f"Mean load gap: {sum(load_gaps) / len(load_gaps):.4f}")
     print(f"Max load gap: {max(load_gaps):.4f}")
     print(f"Min load gap: {min(load_gaps):.4f}")
+    print(f"Num workers: {num_workers}")
