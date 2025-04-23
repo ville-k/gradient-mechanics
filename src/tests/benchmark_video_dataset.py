@@ -11,7 +11,9 @@ from tests import video_dataset
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Benchmark VideoDataset")
     parser.add_argument("video_file_path", type=str)
-    parser.add_argument("--dataloader-cls", type=str, default="torch", choices=["torch", "torchdata"])
+    parser.add_argument(
+        "--dataloader-cls", type=str, default="torch", choices=["torch", "torchdata"]
+    )
     parser.add_argument("--episode-length", type=int, default=8)
     parser.add_argument("--episode-stride", type=int, default=1)
     parser.add_argument("--batch-size", type=int, default=1)

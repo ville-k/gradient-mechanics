@@ -10,7 +10,9 @@ from tests.image_dataset import EncodedImageDataset
 from gradient_mechanics.data import transforms
 
 
-@pytest.mark.parametrize("dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader])
+@pytest.mark.parametrize(
+    "dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader]
+)
 def test_image_decoding(thirty_jpegs_dir_path, dataloader_cls):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [transforms.JPEGDecode(device_id=0)]
@@ -31,7 +33,10 @@ def test_image_decoding(thirty_jpegs_dir_path, dataloader_cls):
         batch_count += 1
     assert batch_count == 6
 
-@pytest.mark.parametrize("dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader])
+
+@pytest.mark.parametrize(
+    "dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader]
+)
 def test_image_resizing(thirty_jpegs_dir_path, dataloader_cls):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [
@@ -56,7 +61,9 @@ def test_image_resizing(thirty_jpegs_dir_path, dataloader_cls):
     assert batch_count == 6
 
 
-@pytest.mark.parametrize("dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader])
+@pytest.mark.parametrize(
+    "dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader]
+)
 def test_image_cropping(thirty_jpegs_dir_path, dataloader_cls):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [
@@ -81,7 +88,9 @@ def test_image_cropping(thirty_jpegs_dir_path, dataloader_cls):
     assert batch_count == 6
 
 
-@pytest.mark.parametrize("dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader])
+@pytest.mark.parametrize(
+    "dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader]
+)
 def test_image_resize_and_crop(thirty_jpegs_dir_path, dataloader_cls):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [
@@ -97,7 +106,6 @@ def test_image_resize_and_crop(thirty_jpegs_dir_path, dataloader_cls):
         gpu_prefetch_factor=1,
         gpu_transforms=gpu_transforms,
     )
-
 
     batch_count = 0
     for batch in dataloader:

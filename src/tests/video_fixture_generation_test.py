@@ -84,9 +84,9 @@ def test_create_test_video_with_key_frames_only(tmp_path):
         assert frame.pict_type == "I", "Not all frames are key frames"
         frame_array = frame.to_ndarray(format="rgb24")
         value = read_frame_value(frame_array)
-        assert (
-            value == frame_index
-        ), f"Unexpected frame value {value} at index {frame_index}"
+        assert value == frame_index, (
+            f"Unexpected frame value {value} at index {frame_index}"
+        )
 
 
 def test_create_test_video_with_key_and_predicted_frames(tmp_path):
@@ -99,18 +99,18 @@ def test_create_test_video_with_key_and_predicted_frames(tmp_path):
         frame_pattern="IP",
     )
     assert video_path.exists(), "Video file not created"
-    assert (
-        video_path.name == "key_and_predicted_frames.mp4"
-    ), "Unexpected video file name"
+    assert video_path.name == "key_and_predicted_frames.mp4", (
+        "Unexpected video file name"
+    )
 
     container = av.open(str(video_path))
     for frame_index, frame in enumerate(container.decode(video=0)):
         expected_frame_type = "I" if frame_index % 2 == 0 else "P"
-        assert (
-            frame.pict_type == expected_frame_type
-        ), f"Unexpected frame type {frame.pict_type} at index {frame_index}"
+        assert frame.pict_type == expected_frame_type, (
+            f"Unexpected frame type {frame.pict_type} at index {frame_index}"
+        )
         frame_array = frame.to_ndarray(format="rgb24")
         value = read_frame_value(frame_array)
-        assert (
-            value == frame_index
-        ), f"Unexpected frame value {value} at index {frame_index}"
+        assert value == frame_index, (
+            f"Unexpected frame value {value} at index {frame_index}"
+        )

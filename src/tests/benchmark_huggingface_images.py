@@ -14,7 +14,7 @@ from torch.utils.tensorboard import SummaryWriter
 from rich.console import Console
 from rich.table import Table
 
-from gradient_mechanics.data.gpu_dataloader import GPUDataLoader
+from gradient_mechanics.data.torch_loading import GPUDataLoader
 from gradient_mechanics.data import transforms
 
 

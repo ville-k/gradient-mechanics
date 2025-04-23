@@ -134,9 +134,9 @@ def test_returns_all_frames_in_order_two_by_two_non_overlapping(
         indices = [frame_id + offset for offset in range(sequence_length)]
 
         packet_buffers = demuxer.packet_buffers_for_frame_indices(indices)
-        assert (
-            len(packet_buffers.target_frames) == sequence_length
-        ), packet_buffers.target_frames
+        assert len(packet_buffers.target_frames) == sequence_length, (
+            packet_buffers.target_frames
+        )
 
         collated = dataloader.default_collate([packet_buffers])
         decoded = decoder.decode_batch(collated)
@@ -168,9 +168,9 @@ def test_returns_all_frames_in_order_two_by_two_non_overlapping_skip_two(
         indices = [frame_id + offset for offset in range(sequence_length)]
 
         packet_buffers = demuxer.packet_buffers_for_frame_indices(indices)
-        assert (
-            len(packet_buffers.target_frames) == sequence_length
-        ), packet_buffers.target_frames
+        assert len(packet_buffers.target_frames) == sequence_length, (
+            packet_buffers.target_frames
+        )
 
         collated = dataloader.default_collate([packet_buffers])
         decoded = decoder.decode_batch(collated)

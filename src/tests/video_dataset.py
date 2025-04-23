@@ -41,7 +41,6 @@ class VideoDataset(torch.utils.data.Dataset):
         )
         self._is_initialized = True
 
-
     def __len__(self):
         """Return the total number of episodes."""
         self._lazy_init()

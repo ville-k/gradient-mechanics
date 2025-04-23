@@ -42,6 +42,7 @@ class MapAndCollate:
     collate.
     TODO: make this a standard utility in torchdata.nodes
     """
+
     def __init__(self, dataset, collate_fn):
         self.dataset = dataset
         self.collate_fn = collate_fn
@@ -52,25 +53,25 @@ class MapAndCollate:
 
 
 def GPUDataLoader(
-        dataset: torch.utils.data.Dataset,
-        batch_size: int,
-        shuffle: bool = False,
-        sampler: torch.utils.data.Sampler = None,
-        batch_sampler: torch.utils.data.BatchSampler = None,
-        num_workers: int = None,
-        collate_fn: Callable = None,
-        pin_memory: bool = None,
-        drop_last: bool = False,
-        timeout: float = 0,
-        worker_init_fn: Callable = None,
-        *,
-        prefetch_factor: int = None,
-        persistent_workers: bool = False,
-        gpu_device: int = 0,
-        gpu_prefetch_factor: int = 1,
-        gpu_num_threads: int = 1,
-        gpu_transforms: List[Transform] = None,
-    ):
+    dataset: torch.utils.data.Dataset,
+    batch_size: int,
+    shuffle: bool = False,
+    sampler: torch.utils.data.Sampler = None,
+    batch_sampler: torch.utils.data.BatchSampler = None,
+    num_workers: int = None,
+    collate_fn: Callable = None,
+    pin_memory: bool = None,
+    drop_last: bool = False,
+    timeout: float = 0,
+    worker_init_fn: Callable = None,
+    *,
+    prefetch_factor: int = None,
+    persistent_workers: bool = False,
+    gpu_device: int = 0,
+    gpu_prefetch_factor: int = 1,
+    gpu_num_threads: int = 1,
+    gpu_transforms: List[Transform] = None,
+):
     """Initialize a DataLoader.
 
     Args:
@@ -132,4 +133,3 @@ def GPUDataLoader(
     loader = tn.Loader(node)
 
     return loader
-

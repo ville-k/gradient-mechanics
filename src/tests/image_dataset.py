@@ -13,8 +13,11 @@ class EncodedImageDataset(torch.utils.data.Dataset):
         self.image_dir = image_dir
         # Do initialization upfront rather than lazily
         self._image_paths = sorted(
-            [path for path in pathlib.Path(image_dir).glob("*.jp*g") 
-             if os.path.isfile(path)]
+            [
+                path
+                for path in pathlib.Path(image_dir).glob("*.jp*g")
+                if os.path.isfile(path)
+            ]
         )
 
     def __len__(self):
@@ -27,4 +30,6 @@ class EncodedImageDataset(torch.utils.data.Dataset):
             return transforms.EncodedImage(buffer=image)
         except Exception as e:
             # Provide better error information
-            raise RuntimeError(f"Error reading image at index {index}, path {self._image_paths[index]}: {str(e)}")
+            raise RuntimeError(
+                f"Error reading image at index {index}, path {self._image_paths[index]}: {str(e)}"
+            )
