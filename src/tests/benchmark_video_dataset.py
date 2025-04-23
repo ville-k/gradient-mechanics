@@ -2,7 +2,7 @@ import argparse
 import logging
 import time
 
-from gradient_mechanics.data import gpu_dataloader
+from gradient_mechanics.data import torch_loading, torchdata_loading
 from gradient_mechanics.data import transforms
 from gradient_mechanics.data import video_transforms
 from tests import video_dataset
@@ -11,6 +11,7 @@ from tests import video_dataset
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Benchmark VideoDataset")
     parser.add_argument("video_file_path", type=str)
+    parser.add_argument("--dataloader-cls", type=str, default="torch", choices=["torch", "torchdata"])
     parser.add_argument("--episode-length", type=int, default=8)
     parser.add_argument("--episode-stride", type=int, default=1)
     parser.add_argument("--batch-size", type=int, default=1)
@@ -27,6 +28,12 @@ if __name__ == "__main__":
     batch_size = args.batch_size
     num_workers = args.num_workers
     device_id = args.device_id
+    if args.dataloader_cls == "torchdata":
+        dataloader_cls = torchdata_loading.GPUDataLoader
+    elif args.dataloader_cls == "torch":
+        dataloader_cls = torch_loading.GPUDataLoader
+    else:
+        raise ValueError(f"Invalid dataloader class: {args.dataloader_cls}")
 
     dataset = video_dataset.VideoDataset(
         video_file_path, episode_length=episode_length, episode_stride=episode_stride
@@ -36,7 +43,7 @@ if __name__ == "__main__":
         video_transforms.DecodeVideo(device_id=device_id),
         transforms.ToTensor(device_id=device_id),
     ]
-    loader = gpu_dataloader.GPUDataLoader(
+    loader = torch_loading.GPUDataLoader(
         dataset,
         batch_size=batch_size,
         num_workers=num_workers,
@@ -78,3 +85,6 @@ if __name__ == "__main__":
     print(f"Max load gap: {max(load_gaps):.4f}")
     print(f"Min load gap: {min(load_gaps):.4f}")
     print(f"Num workers: {num_workers}")
+    # print out the dataloader class and module
+    print(f"Dataloader class: {dataloader_cls.__name__}")
+    print(f"Dataloader module: {dataloader_cls.__module__}")

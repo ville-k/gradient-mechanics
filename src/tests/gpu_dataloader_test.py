@@ -1,16 +1,20 @@
 import torch
 import cvcuda
 import numpy as np
-from gradient_mechanics.data import gpu_dataloader
+import pytest
+
+from gradient_mechanics.data import torch_loading
+from gradient_mechanics.data import torchdata_loading
 from tests.image_dataset import EncodedImageDataset
 
 from gradient_mechanics.data import transforms
 
 
-def test_image_decoding(thirty_jpegs_dir_path):
+@pytest.mark.parametrize("dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader])
+def test_image_decoding(thirty_jpegs_dir_path, dataloader_cls):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [transforms.JPEGDecode(device_id=0)]
-    dataloader = gpu_dataloader.GPUDataLoader(
+    dataloader = dataloader_cls(
         dataset,
         batch_size=5,
         num_workers=0,
@@ -27,14 +31,14 @@ def test_image_decoding(thirty_jpegs_dir_path):
         batch_count += 1
     assert batch_count == 6
 
-
-def test_image_resizing(thirty_jpegs_dir_path):
+@pytest.mark.parametrize("dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader])
+def test_image_resizing(thirty_jpegs_dir_path, dataloader_cls):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [
         transforms.JPEGDecode(device_id=0),
         transforms.Resize(device_id=0, height=360, width=640),
     ]
-    dataloader = gpu_dataloader.GPUDataLoader(
+    dataloader = dataloader_cls(
         dataset,
         batch_size=5,
         num_workers=0,
@@ -52,13 +56,14 @@ def test_image_resizing(thirty_jpegs_dir_path):
     assert batch_count == 6
 
 
-def test_image_cropping(thirty_jpegs_dir_path):
+@pytest.mark.parametrize("dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader])
+def test_image_cropping(thirty_jpegs_dir_path, dataloader_cls):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [
         transforms.JPEGDecode(device_id=0),
         transforms.Crop(device_id=0, x=180, y=320, height=180, width=320),
     ]
-    dataloader = gpu_dataloader.GPUDataLoader(
+    dataloader = dataloader_cls(
         dataset,
         batch_size=5,
         num_workers=0,
@@ -76,14 +81,15 @@ def test_image_cropping(thirty_jpegs_dir_path):
     assert batch_count == 6
 
 
-def test_image_resize_and_crop(thirty_jpegs_dir_path):
+@pytest.mark.parametrize("dataloader_cls", [torch_loading.GPUDataLoader, torchdata_loading.GPUDataLoader])
+def test_image_resize_and_crop(thirty_jpegs_dir_path, dataloader_cls):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [
         transforms.JPEGDecode(device_id=0),
         transforms.Resize(device_id=0, height=360, width=640),
         transforms.Crop(device_id=0, x=90, y=160, height=90, width=160),
     ]
-    dataloader = gpu_dataloader.GPUDataLoader(
+    dataloader = dataloader_cls(
         dataset,
         batch_size=5,
         num_workers=0,
@@ -91,6 +97,7 @@ def test_image_resize_and_crop(thirty_jpegs_dir_path):
         gpu_prefetch_factor=1,
         gpu_transforms=gpu_transforms,
     )
+
 
     batch_count = 0
     for batch in dataloader:

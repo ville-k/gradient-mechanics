@@ -1,5 +1,5 @@
 from tests.image_dataset import EncodedImageDataset
-from gradient_mechanics.data import gpu_dataloader, transforms
+from gradient_mechanics.data import torch_loading, transforms
 
 
 def test_encoded_image_dataset_returns_correct_length(thirty_jpegs_dir_path):
@@ -16,7 +16,7 @@ def test_encoded_image_dataset_returns_correct_length(thirty_jpegs_dir_path):
 def test_encoded_image_dataset_collates_correctly(thirty_jpegs_dir_path):
     dataset = EncodedImageDataset(image_dir=thirty_jpegs_dir_path)
     gpu_transforms = [transforms.JPEGDecode(device_id=0)]
-    dataloader = gpu_dataloader.GPUDataLoader(
+    dataloader = torch_loading.GPUDataLoader(
         dataset,
         batch_size=3,
         num_workers=0,
