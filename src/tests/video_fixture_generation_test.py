@@ -1,6 +1,7 @@
 import av
 import numpy as np
 import pytest
+from av.video.frame import PictureType
 
 
 from video_fixture_generation import (
@@ -81,7 +82,7 @@ def test_create_test_video_with_key_frames_only(tmp_path):
 
     container = av.open(str(video_path))
     for frame_index, frame in enumerate(container.decode(video=0)):
-        assert frame.pict_type == "I", "Not all frames are key frames"
+        assert PictureType(frame.pict_type).name == "I", "Not all frames are key frames"
         frame_array = frame.to_ndarray(format="rgb24")
         value = read_frame_value(frame_array)
         assert value == frame_index, (
@@ -106,8 +107,8 @@ def test_create_test_video_with_key_and_predicted_frames(tmp_path):
     container = av.open(str(video_path))
     for frame_index, frame in enumerate(container.decode(video=0)):
         expected_frame_type = "I" if frame_index % 2 == 0 else "P"
-        assert frame.pict_type == expected_frame_type, (
-            f"Unexpected frame type {frame.pict_type} at index {frame_index}"
+        assert PictureType(frame.pict_type).name == expected_frame_type, (
+            f"Unexpected frame type {PictureType(frame.pict_type).name} at index {frame_index}"
         )
         frame_array = frame.to_ndarray(format="rgb24")
         value = read_frame_value(frame_array)

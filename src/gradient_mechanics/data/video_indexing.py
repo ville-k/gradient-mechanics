@@ -1,9 +1,9 @@
 import dataclasses
 import pathlib
-from typing import Self
 
 import av
 import av.container
+from av.video.frame import PictureType
 
 
 @dataclasses.dataclass(frozen=True)
@@ -79,7 +79,7 @@ class VideoIndex:
         raise ValueError(f"No following P or I frame found for frame {frame_index}")
 
     @classmethod
-    def generate(cls, video_file_path: pathlib.Path) -> Self:
+    def generate(cls, video_file_path: pathlib.Path) -> "VideoIndex":
         container: av.container.InputContainer = av.open(str(video_file_path))
         number_of_frames = 0
         duration_time_base = 0
@@ -99,7 +99,7 @@ class VideoIndex:
                     frame_number=number_of_frames,
                     timestamp=float(frame.pts * frame.time_base),
                     packet_index=number_of_frames,
-                    picture_type=frame.pict_type.name,
+                    picture_type=PictureType(frame.pict_type).name,
                 )
 
                 number_of_frames += 1

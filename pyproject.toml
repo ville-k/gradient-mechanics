@@ -3,7 +3,7 @@ name = "gradient-mechanics"
 version = "0.0.2"
 description = "Accelerated deep learning."
 readme = "README.md"
-requires-python = "==3.11.*"
+requires-python = ">=3.10"
 dependencies = [
     "cvcuda-cu12>=0.14.0",
     "numpy>=1.26.0",
@@ -31,4 +31,3 @@ dev-dependencies = [
     "rich>=13.9.4",
     "ruff>=0.11.6",
 ]
-python-preference = "system"

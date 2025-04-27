@@ -1,5 +1,6 @@
 import ctypes
-from typing import List, Self
+import enum
+from typing import List
 import typing
 
 import numpy as np
@@ -44,7 +45,9 @@ class PacketBuffers(typing.NamedTuple):
     """List of packets. This contains packets for the target frames and any frames the target frames depend on."""
 
     @classmethod
-    def collate(cls, samples: List[Self], *, collate_fn_map=None) -> PacketBuffersBatch:
+    def collate(
+        cls, samples: List["PacketBuffers"], *, collate_fn_map=None
+    ) -> PacketBuffersBatch:
         """"""
         return PacketBuffersBatch(samples=samples)
 
@@ -60,13 +63,22 @@ def _to_rgb_tensor(nvcv_image: cvcuda.Image):
     return nvcv_nhwc_rgb
 
 
+class Codec(enum.Enum):
+    """Codec for video decoding."""
+
+    AV1 = nvc.cudaVideoCodec.AV1
+    H264 = nvc.cudaVideoCodec.H264
+    HEVC = nvc.cudaVideoCodec.HEVC
+
+
 class DecodeVideo(transforms.Transform):
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, *, codec: Codec = Codec.H264, **kwargs) -> None:
         super().__init__(**kwargs)
         self.register_input_type(PacketBuffersBatch)
+        self._codec = codec
         self._decoder = nvc.CreateDecoder(
             gpuid=self.device_id,
-            codec=nvc.cudaVideoCodec.H264,
+            codec=codec.value,
             cudacontext=0,
             cudastream=0,
             usedevicememory=True,
@@ -138,8 +150,9 @@ class DecodeVideo(transforms.Transform):
                         target_frame_id_to_tensor[frame_id] = torch_tensor
                     frame_packet_offset += 1
 
-        assert all(
-            tensor is not None for tensor in target_frame_id_to_tensor.values()
-        ), {key: type(value) for key, value in target_frame_id_to_tensor.items()}
+        if not all(tensor is not None for tensor in target_frame_id_to_tensor.values()):
+            raise ValueError(
+                f"DecodeVideo failed to decode all packet buffers. Make sure the video is encoded with the selected codec: '{self._codec.name}'"
+            )
 
         return list(target_frame_id_to_tensor.values())
