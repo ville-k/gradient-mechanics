@@ -1,4 +1,5 @@
 import dataclasses
+import json
 import pathlib
 
 import av
@@ -16,6 +17,7 @@ class FrameInfo:
 
 @dataclasses.dataclass(frozen=True)
 class VideoIndex:
+    video_file_path: str
     number_of_frames: int
     duration_in_seconds: float
     frame_index_to_info: dict[int, FrameInfo] = dataclasses.field(default_factory=dict)
@@ -78,6 +80,30 @@ class VideoIndex:
                 return i
         raise ValueError(f"No following P or I frame found for frame {frame_index}")
 
+    def save(self, file_path: pathlib.Path):
+        """Save the video index to a JSON file."""
+        with open(file_path, "w") as f:
+            json.dump(dataclasses.asdict(self), f)
+
+    @classmethod
+    def load(cls, file_path: pathlib.Path) -> "VideoIndex":
+        """Load the video index from a JSON file."""
+        with open(file_path, "r") as f:
+            content = json.load(f)
+            video_file_path = content["video_file_path"]
+            number_of_frames = content["number_of_frames"]
+            duration_seconds = content["duration_in_seconds"]
+            frame_index_to_info = {
+                int(frame_index): FrameInfo(**frame_info)
+                for frame_index, frame_info in content["frame_index_to_info"].items()
+            }
+            return VideoIndex(
+                video_file_path=video_file_path,
+                number_of_frames=number_of_frames,
+                duration_in_seconds=duration_seconds,
+                frame_index_to_info=frame_index_to_info,
+            )
+
     @classmethod
     def generate(cls, video_file_path: pathlib.Path) -> "VideoIndex":
         container: av.container.InputContainer = av.open(str(video_file_path))
@@ -107,6 +133,7 @@ class VideoIndex:
         duration_in_seconds = float((duration_time_base * time_base))
         assert number_of_frames == len(frame_index_to_info)
         return VideoIndex(
+            video_file_path=str(video_file_path),
             number_of_frames=len(frame_index_to_info),
             duration_in_seconds=duration_in_seconds,
             frame_index_to_info=frame_index_to_info,

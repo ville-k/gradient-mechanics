@@ -135,3 +135,10 @@ def test_some_key_frames_packet_indices_for_frames(video_some_keyframes_path):
 
     packet_indices_for_frames = index.packet_indices_for_frames([3, 9, 12])
     assert packet_indices_for_frames == [0, 3, 4, 8, 9, 12]
+
+
+def test_save_and_load_video_index(video_all_keyframes_path, tmp_path):
+    index = video_indexing.VideoIndex.generate(video_all_keyframes_path)
+    index.save(tmp_path / "video_index.json")
+    index_loaded = video_indexing.VideoIndex.load(tmp_path / "video_index.json")
+    assert index == index_loaded

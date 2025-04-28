@@ -1,7 +1,7 @@
 import pytest
 import torch
 from torch.utils.data import dataloader
-from gradient_mechanics.data import video_demuxing
+from gradient_mechanics.data import video_demuxing, video_indexing
 from gradient_mechanics.data import video_transforms
 
 import video_fixture_generation
@@ -9,7 +9,8 @@ import video_fixture_generation
 
 @pytest.mark.parametrize("batch_size", [1, 2, 3, 4])
 def test_collates_packet_buffers(batch_size, ten_key_frame_video):
-    demuxer = video_demuxing.IndexingDemuxer(str(ten_key_frame_video))
+    index = video_indexing.VideoIndex.generate(ten_key_frame_video)
+    demuxer = video_demuxing.IndexingDemuxer(str(ten_key_frame_video), index)
 
     samples = []
     for sample_index in range(batch_size):
@@ -28,7 +29,8 @@ def test_collates_packet_buffers(batch_size, ten_key_frame_video):
 )
 def test_returns_all_frames_in_order_ony_by_one(video_path_fixture, request):
     video_path = request.getfixturevalue(video_path_fixture)
-    demuxer = video_demuxing.IndexingDemuxer(str(video_path))
+    index = video_indexing.VideoIndex.generate(video_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(video_path), index)
     assert len(demuxer) == 10
 
     decoder = video_transforms.DecodeVideo(device_id=0)
@@ -51,7 +53,8 @@ def test_returns_all_frames_in_order_ony_by_one_batch_size_two(
     video_path_fixture, request
 ):
     video_path = request.getfixturevalue(video_path_fixture)
-    demuxer = video_demuxing.IndexingDemuxer(str(video_path))
+    index = video_indexing.VideoIndex.generate(video_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(video_path), index)
     assert len(demuxer) == 10
 
     decoder = video_transforms.DecodeVideo(device_id=0)
@@ -75,7 +78,8 @@ def test_returns_all_frames_in_order_ony_by_one_batch_size_two(
 )
 def test_returns_all_frames_in_order_all_at_once(video_path_fixture, request):
     video_path = request.getfixturevalue(video_path_fixture)
-    demuxer = video_demuxing.IndexingDemuxer(str(video_path))
+    index = video_indexing.VideoIndex.generate(video_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(video_path), index)
     assert len(demuxer) == 10
     indices = list(range(len(demuxer)))
     packet_buffers = demuxer.packet_buffers_for_frame_indices(indices)
@@ -98,7 +102,8 @@ def test_returns_all_frames_in_order_two_by_two_overlapping(
     video_path_fixture, request
 ):
     video_path = request.getfixturevalue(video_path_fixture)
-    demuxer = video_demuxing.IndexingDemuxer(str(video_path))
+    index = video_indexing.VideoIndex.generate(video_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(video_path), index)
     assert len(demuxer) == 10
     decoder = video_transforms.DecodeVideo(device_id=0)
     for frame_id in range(len(demuxer) - 1):
@@ -125,7 +130,8 @@ def test_returns_all_frames_in_order_two_by_two_non_overlapping(
     video_path_fixture, request
 ):
     video_path = request.getfixturevalue(video_path_fixture)
-    demuxer = video_demuxing.IndexingDemuxer(str(video_path))
+    index = video_indexing.VideoIndex.generate(video_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(video_path), index)
     assert len(demuxer) == 10
     decoder = video_transforms.DecodeVideo(device_id=0)
 
@@ -158,7 +164,8 @@ def test_returns_all_frames_in_order_two_by_two_non_overlapping_skip_two(
     video_path_fixture, request
 ):
     video_path = request.getfixturevalue(video_path_fixture)
-    demuxer = video_demuxing.IndexingDemuxer(str(video_path))
+    index = video_indexing.VideoIndex.generate(video_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(video_path), index)
     assert len(demuxer) == 10
     decoder = video_transforms.DecodeVideo(device_id=0)
 

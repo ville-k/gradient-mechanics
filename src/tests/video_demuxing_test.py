@@ -1,26 +1,29 @@
-from gradient_mechanics.data import video_demuxing
+from gradient_mechanics.data import video_demuxing, video_indexing
 
 import pytest
 
 
 def test_raises_on_invalid_video_file_path():
     with pytest.raises(FileNotFoundError):
-        video_demuxing.IndexingDemuxer("invalid_file_path.mp4")
+        video_demuxing.IndexingDemuxer("invalid_file_path.mp4", None)
 
 
 def test_returns_correct_length(short_mp4_file_path):
-    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path))
+    index = video_indexing.VideoIndex.generate(short_mp4_file_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path), index)
     assert len(demuxer) == 30
 
 
 def test_raises_on_empty_frame_indices(short_mp4_file_path):
-    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path))
+    index = video_indexing.VideoIndex.generate(short_mp4_file_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path), index)
     with pytest.raises(ValueError, match="frame_indices must not be empty"):
         demuxer.packet_buffers_for_frame_indices([])
 
 
 def test_raises_on_below_bounds_frame_indices(short_mp4_file_path):
-    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path))
+    index = video_indexing.VideoIndex.generate(short_mp4_file_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path), index)
     with pytest.raises(
         ValueError, match="frame_indices must be within the range of the video"
     ):
@@ -28,7 +31,8 @@ def test_raises_on_below_bounds_frame_indices(short_mp4_file_path):
 
 
 def test_raises_on_above_bounds_frame_indices(short_mp4_file_path):
-    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path))
+    index = video_indexing.VideoIndex.generate(short_mp4_file_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path), index)
     above_bounds_frame = len(demuxer) + 1
     with pytest.raises(
         ValueError, match="frame_indices must be within the range of the video"
@@ -37,7 +41,8 @@ def test_raises_on_above_bounds_frame_indices(short_mp4_file_path):
 
 
 def test_returns_correct_packet_buffers_for_a_keyframe(short_mp4_file_path):
-    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path))
+    index = video_indexing.VideoIndex.generate(short_mp4_file_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path), index)
     packet_buffers = demuxer.packet_buffers_for_frame_indices([0])
     assert packet_buffers.target_frames == [0]
     assert packet_buffers.packet_frames == [0]
@@ -45,7 +50,8 @@ def test_returns_correct_packet_buffers_for_a_keyframe(short_mp4_file_path):
 
 
 def test_returns_correct_packet_buffers_for_a_b_frame(short_mp4_file_path):
-    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path))
+    index = video_indexing.VideoIndex.generate(short_mp4_file_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path), index)
     packet_buffers = demuxer.packet_buffers_for_frame_indices([1])
     assert packet_buffers.target_frames == [1]
     assert packet_buffers.packet_frames == [0, 1, 4]
@@ -53,7 +59,8 @@ def test_returns_correct_packet_buffers_for_a_b_frame(short_mp4_file_path):
 
 
 def test_returns_correct_packet_buffers_for_a_p_frame(short_mp4_file_path):
-    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path))
+    index = video_indexing.VideoIndex.generate(short_mp4_file_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path), index)
     packet_buffers = demuxer.packet_buffers_for_frame_indices([4])
     assert packet_buffers.target_frames == [4]
     assert packet_buffers.packet_frames == [0, 4]
@@ -61,7 +68,8 @@ def test_returns_correct_packet_buffers_for_a_p_frame(short_mp4_file_path):
 
 
 def test_returns_correct_packet_buffers_for_multiple_frames(short_mp4_file_path):
-    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path))
+    index = video_indexing.VideoIndex.generate(short_mp4_file_path)
+    demuxer = video_demuxing.IndexingDemuxer(str(short_mp4_file_path), index)
     packet_buffers = demuxer.packet_buffers_for_frame_indices([0, 1, 4])
     assert packet_buffers.target_frames == [0, 1, 4]
     assert packet_buffers.packet_frames == [0, 1, 4]

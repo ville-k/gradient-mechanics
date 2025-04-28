@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import List, Optional
 
 import PyNvVideoCodec as nvc
@@ -9,15 +10,20 @@ logger = logging.getLogger(__name__)
 
 
 class IndexingDemuxer:
-    def __init__(self, video_file_path: str) -> None:
+    def __init__(
+        self, video_file_path: str, video_index: video_indexing.VideoIndex
+    ) -> None:
         """
         Initialize the IndexingDemuxer.
 
         Args:
             video_file_path: Path to the video file to demux.
+            video_index: Video index to use for demuxing.
         """
+        if not os.path.exists(video_file_path):
+            raise FileNotFoundError(f"Video file {video_file_path} does not exist")
         self._video_file_path = video_file_path
-        self._video_index = video_indexing.VideoIndex.generate(video_file_path)
+        self._video_index = video_index
 
     def __len__(self) -> int:
         return len(self._video_index)

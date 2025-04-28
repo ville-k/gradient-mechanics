@@ -1,11 +1,12 @@
 import cvcuda
 import numpy as np
-from gradient_mechanics.data import video_transforms
+from gradient_mechanics.data import video_indexing, video_transforms
 from gradient_mechanics.data import video_demuxing
 
 
 def test_decode_single_sample(ten_key_frame_video):
-    demuxer = video_demuxing.IndexingDemuxer(str(ten_key_frame_video))
+    index = video_indexing.VideoIndex.generate(ten_key_frame_video)
+    demuxer = video_demuxing.IndexingDemuxer(str(ten_key_frame_video), index)
     packet_buffers: video_transforms.PacketBuffers = (
         demuxer.packet_buffers_for_frame_indices([0])
     )
@@ -19,7 +20,8 @@ def test_decode_single_sample(ten_key_frame_video):
 
 
 def test_decode_batch(ten_key_frame_video):
-    demuxer = video_demuxing.IndexingDemuxer(str(ten_key_frame_video))
+    index = video_indexing.VideoIndex.generate(ten_key_frame_video)
+    demuxer = video_demuxing.IndexingDemuxer(str(ten_key_frame_video), index)
     packet_buffers: video_transforms.PacketBuffers = (
         demuxer.packet_buffers_for_frame_indices([0])
     )
@@ -35,7 +37,8 @@ def test_decode_batch(ten_key_frame_video):
 
 
 def test_decode_transform_interface(ten_key_frame_video):
-    demuxer = video_demuxing.IndexingDemuxer(str(ten_key_frame_video))
+    index = video_indexing.VideoIndex.generate(ten_key_frame_video)
+    demuxer = video_demuxing.IndexingDemuxer(str(ten_key_frame_video), index)
     packet_buffers: video_transforms.PacketBuffers = (
         demuxer.packet_buffers_for_frame_indices([0])
     )
