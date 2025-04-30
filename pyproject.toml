@@ -1,6 +1,6 @@
 [project]
 name = "gradient-mechanics"
-version = "0.0.2"
+version = "0.0.4"
 description = "Accelerated deep learning."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -10,8 +10,7 @@ dependencies = [
     "nvidia-nvimgcodec-cu12>=0.5.0.13",
     "pyav>=13.1.0",
     "pynvvideocodec>=1.0.2",
-    "torch>=2.5.1",
-    "torchvision>=0.20.1",
+    "torch>=2.0.1",
 ]
 
 [build-system]
@@ -20,13 +19,13 @@ build-backend = "hatchling.build"
 
 [tool.uv]
 dev-dependencies = [
-    "debugpy>=1.8.8",
     "datasets[vision]>=3.1.0",
     "mkdocs-material>=9.5.39",
     "pytest>=8.3.3",
     "tensorboard>=2.18.0",
     "tensorboard-plugin-profile>=2.18.0",
     "torchdata>=0.11.0",
+    "torchvision>=0",
     "torch-tb-profiler>=0.4.3",
     "rich>=13.9.4",
     "ruff>=0.11.6",
