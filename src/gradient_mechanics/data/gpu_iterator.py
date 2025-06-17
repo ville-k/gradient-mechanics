@@ -64,7 +64,8 @@ class GPUIterator:
                 if stop_iteration:
                     raise StopIteration
                 else:
-                    self.submit_next()
+                    # prefetch the next batch when no futures are available to avoid stalls
+                    self._submit_next()
 
             future = self.futures.popleft()
             try:
