@@ -1,18 +1,15 @@
 # Getting Started
 
+This guide walks you through setting up a local development environment for
+Gradient Mechanics.
+
 ## Setup
 
-This project is developed using [uv](https://docs.astral.sh/uv/).
-
-After you've installed uv, you can create a venv using:
+The project is developed using [uv](https://docs.astral.sh/uv/). After you have
+installed `uv`, create a virtual environment and download all dependencies:
 
 ```sh
 uv venv
-```
-
-Download all dependencies, including dev-dependencies:
-
-```sh
 uv sync
 ```
 
