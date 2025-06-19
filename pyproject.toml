@@ -3,14 +3,15 @@ name = "gradient-mechanics"
 version = "0.0.4"
 description = "Accelerated deep learning."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "cvcuda-cu12>=0.14.0",
     "numpy>=1.26.0",
     "nvidia-nvimgcodec-cu12>=0.5.0.13",
-    "pyav>=13.1.0",
+    "av>=13.1.0",
     "pynvvideocodec>=1.0.2",
     "torch>=2.0.1",
+    "pycuda>=2025.1.1",
 ]
 
 [build-system]

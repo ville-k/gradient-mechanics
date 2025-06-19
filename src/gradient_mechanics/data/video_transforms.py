@@ -12,6 +12,8 @@ from gradient_mechanics.data import transforms
 import torch
 from torch.utils.data._utils import collate
 
+import pycuda.driver as cuda
+
 
 def packet_from_buffer(buffer: torch.ByteTensor) -> nvc.PacketData:
     packet = nvc.PacketData()
@@ -76,11 +78,14 @@ class DecodeVideo(transforms.Transform):
         super().__init__(**kwargs)
         self.register_input_type(PacketBuffersBatch)
         self._codec = codec
+        cuda_device = cuda.Device(self.device_id)
+        self._cuda_context = cuda_device.retain_primary_context()
+
         self._decoder = nvc.CreateDecoder(
             gpuid=self.device_id,
             codec=codec.value,
-            cudacontext=0,
-            cudastream=0,
+            cudacontext=self._cuda_context.handle,
+            cudastream=self.stream,
             usedevicememory=True,
         )
 
@@ -93,11 +98,15 @@ class DecodeVideo(transforms.Transform):
         return decoded_batches
 
     def decode_batch(self, batch: PacketBuffersBatch) -> list[cvcuda.Tensor]:
-        decoded_batch: list[cvcuda.Tensor] = []
-        for packet_buffers in batch.samples:
-            decoded = self.decode_sample(packet_buffers)
-            decoded_batch.append(cvcuda.stack(decoded))
-        return decoded_batch
+        self._cuda_context.push()
+        try:
+            decoded_batch: list[cvcuda.Tensor] = []
+            for packet_buffers in batch.samples:
+                decoded = self.decode_sample(packet_buffers)
+                decoded_batch.append(cvcuda.stack(decoded))
+            return decoded_batch
+        finally:
+            self._cuda_context.pop()
 
     def decode_sample(
         self, episode_packet_buffer: PacketBuffers

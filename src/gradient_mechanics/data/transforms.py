@@ -25,7 +25,7 @@ class Transform:
         """
         self.device_id = device_id
         self.device = torch.device("cuda", device_id)
-        self.stream = stream or 0
+        self.stream = stream if stream else 0
         self.input_types: Set[Any] = set()
 
     def register_input_type(self, input_type: type) -> None:
@@ -35,7 +35,8 @@ class Transform:
     def __call__(self, batch: List[Any]) -> List[cvcuda.Tensor]:
         """Apply the transform to a list of registered data types."""
         try:
-            transformed = _apply_recursive(self.transform, batch, self.input_types)
+            with self.device:
+                transformed = _apply_recursive(self.transform, batch, self.input_types)
         except Exception as e:
             print(
                 f"Exception was raised during the processing of transform '{self.__class__.__name__}'. This could be caused by input data not conforming to what is expected of container types.",
