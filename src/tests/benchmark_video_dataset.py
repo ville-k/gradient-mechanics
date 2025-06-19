@@ -6,7 +6,7 @@ from gradient_mechanics.data import torch_loading, torchdata_loading
 from gradient_mechanics.data import transforms
 from gradient_mechanics.data import video_transforms
 from tests import video_dataset
-
+import torch
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -54,11 +54,17 @@ if __name__ == "__main__":
         video_file_path, episode_length=episode_length, episode_stride=episode_stride
     )
 
+    torch_stream = torch.cuda.default_stream()
+
     gpu_transforms = [
-        video_transforms.DecodeVideo(device_id=device_id, codec=codec),
-        transforms.ToTensor(device_id=device_id),
+        video_transforms.DecodeVideo(
+            device_id=device_id,
+            codec=codec,
+            stream=torch_stream.cuda_stream,
+        ),
+        transforms.ToTensor(device_id=device_id, stream=torch_stream.cuda_stream),
     ]
-    loader = torch_loading.GPUDataLoader(
+    loader = dataloader_cls(
         dataset,
         batch_size=batch_size,
         num_workers=num_workers,
@@ -85,8 +91,7 @@ if __name__ == "__main__":
         load_started_at = time.perf_counter()
         print(f"Batch: {i} - {len(batch)} frames in {load_gaps[-1]:.4f} seconds")
         batches_loaded += 1
-        for sample in batch:
-            samples_loaded += sample.shape[0]
+        samples_loaded += batch.shape[0]
 
     ended_at = time.perf_counter()
 

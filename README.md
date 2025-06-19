@@ -13,13 +13,14 @@ Create and sync the development environment using
 
 ```sh
 uv venv
+source .venv/bin/activate
 uv sync
 ```
 
 Run the tests to make sure everything is set up correctly:
 
 ```sh
-uv run pytest
+pytest
 ```
 
 ## Benchmarks
