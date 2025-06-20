@@ -30,4 +30,11 @@ dev-dependencies = [
     "torch-tb-profiler>=0.4.3",
     "rich>=13.9.4",
     "ruff>=0.11.6",
+    "ty>=0.0.1a11",
 ]
+
+[tool.ty.src]
+root = "./src/gradient_mechanics"
+
+[tool.ty.rules]
+unresolved-attribute = "ignore"

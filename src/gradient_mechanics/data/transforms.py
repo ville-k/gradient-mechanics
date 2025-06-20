@@ -1,7 +1,7 @@
 import logging
 import sys
 import time
-from typing import Any, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import typing
 import cvcuda
 import numpy as np
@@ -32,7 +32,7 @@ class Transform:
         """Register the input type that the transform can process."""
         self.input_types.add(input_type)
 
-    def __call__(self, batch: List[Any]) -> List[cvcuda.Tensor]:
+    def __call__(self, batch: Any) -> Any:
         """Apply the transform to a list of registered data types."""
         try:
             with self.device:
@@ -53,7 +53,7 @@ class Transform:
 
 def _apply_recursive(
     transform: Transform, data: List[Any], registered_types: Set[type]
-) -> List[Any]:
+) -> Any:
     """Apply the transform to the data recursively. This function is used to apply the transform to collections of registered types within nested data structures."""
     if type(data) in registered_types:
         return transform([data])[0]

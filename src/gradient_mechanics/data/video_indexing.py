@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from fractions import Fraction
 import pathlib
 
 import av
@@ -12,7 +13,7 @@ class FrameInfo:
     frame_number: int
     timestamp: float
     packet_index: int
-    picture_type: str = None
+    picture_type: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -94,7 +95,12 @@ class VideoIndex:
             number_of_frames = content["number_of_frames"]
             duration_seconds = content["duration_in_seconds"]
             frame_index_to_info = {
-                int(frame_index): FrameInfo(**frame_info)
+                int(frame_index): FrameInfo(
+                    frame_number=frame_info["frame_number"],
+                    timestamp=frame_info["timestamp"],
+                    packet_index=frame_info["packet_index"],
+                    picture_type=frame_info["picture_type"],
+                )
                 for frame_index, frame_info in content["frame_index_to_info"].items()
             }
             return VideoIndex(
@@ -107,13 +113,18 @@ class VideoIndex:
     @classmethod
     def generate(cls, video_file_path: pathlib.Path) -> "VideoIndex":
         container: av.container.InputContainer = av.open(str(video_file_path))
-        number_of_frames = 0
-        duration_time_base = 0
-        time_base = None
+        number_of_frames: int = 0
+        duration_time_base: int = 0
+        time_base: Fraction | None = None
 
         frame_index_to_info: dict[int, FrameInfo] = dict()
 
         for packet in container.demux(video=0):
+            if packet.duration is None:
+                raise ValueError(f"Packet duration is None for packet {packet}")
+            if packet.time_base is None:
+                raise ValueError(f"Packet time base is None for packet {packet}")
+
             duration_time_base += packet.duration
             time_base = packet.time_base
 
@@ -129,6 +140,9 @@ class VideoIndex:
                 )
 
                 number_of_frames += 1
+
+        if time_base is None:
+            raise ValueError(f"Time base is None for video {video_file_path}")
 
         duration_in_seconds = float((duration_time_base * time_base))
         assert number_of_frames == len(frame_index_to_info)
