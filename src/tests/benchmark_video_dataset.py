@@ -89,7 +89,6 @@ if __name__ == "__main__":
             first_batch_received_at = load_ended_at
 
         load_started_at = time.perf_counter()
-        print(f"Batch: {i} - {len(batch)} frames in {load_gaps[-1]:.4f} seconds")
         batches_loaded += 1
         samples_loaded += batch.shape[0]
 
@@ -100,7 +99,9 @@ if __name__ == "__main__":
     print(
         f"Construction time: {construction_ended_at - construction_started_at:.2f} seconds"
     )
-    print(f"Time to first batch: {first_batch_received_at - started_at:.2f} seconds")
+    print(
+        f"Time to first batch: {first_batch_received_at - construction_started_at:.2f} seconds"
+    )
     print(f"Time taken: {ended_at - started_at:.2f} seconds")
     print(f"Throughput: {throughput:.2f} samples per second")
     print(
@@ -109,11 +110,9 @@ if __name__ == "__main__":
 
     warmup = 2
     load_gaps = load_gaps[warmup:]
-    print(f"Mean load gap: {sum(load_gaps) / len(load_gaps):.4f}")
-    print(f"Max load gap: {max(load_gaps):.4f}")
-    print(f"Min load gap: {min(load_gaps):.4f}")
+    print(
+        f"Load gap min/mean/max: {min(load_gaps) * 1000:.0f}/{sum(load_gaps) / len(load_gaps) * 1000:.0f}/{max(load_gaps) * 1000:.0f} ms"
+    )
     print(f"Num workers: {num_workers}")
-    # print out the dataloader class and module
-    print(f"Dataloader class: {dataloader_cls.__name__}")
-    print(f"Dataloader module: {dataloader_cls.__module__}")
+    print(f"Dataloader: {dataloader_cls.__module__}.{dataloader_cls.__name__}")
     print(f"Shuffle: {shuffle}")

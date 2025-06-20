@@ -66,15 +66,13 @@ def test_episode_index_out_of_range():
     episode_generator = episodes.EpisodeGenerator(
         sample_count=10, episode_length=2, episode_stride=2
     )
-    pytest.raises(
-        IndexError,
-        episode_generator.episode_samples_indices,
-        episode_generator.episode_count(),
-    )
+    with pytest.raises(IndexError):
+        episode_generator.episode_samples_indices(episode_generator.episode_count())
 
 
 def test_episode_index_negative_raises_error():
     episode_generator = episodes.EpisodeGenerator(
         sample_count=10, episode_length=2, episode_stride=2
     )
-    pytest.raises(IndexError, episode_generator.episode_samples_indices, -1)
+    with pytest.raises(IndexError):
+        episode_generator.episode_samples_indices(-1)

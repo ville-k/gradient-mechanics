@@ -22,8 +22,8 @@ def packet_from_buffer(buffer: torch.ByteTensor) -> nvc.PacketData:
     return packet
 
 
-def buffer_from_packet(packet: nvc.PacketData) -> torch.ByteTensor:
-    numpy_byte_array = np.ctypeslib.as_array(
+def buffer_from_packet(packet: nvc.PacketData) -> torch.Tensor:
+    numpy_byte_array: np.ndarray[np.uint8] = np.ctypeslib.as_array(
         ctypes.cast(packet.bsl_data, ctypes.POINTER(ctypes.c_uint8)),
         shape=(packet.bsl,),
     )
@@ -57,7 +57,7 @@ class PacketBuffers(typing.NamedTuple):
 collate.default_collate_fn_map[PacketBuffers] = PacketBuffers.collate
 
 
-def _to_rgb_tensor(nvcv_image: cvcuda.Image):
+def _to_rgb_tensor(nvcv_image: cvcuda.Image) -> cvcuda.Tensor:
     nvcv_tensor: cvcuda.Tensor = cvcuda.as_tensor(nvcv_image)
     nvcv_nhwc = cvcuda.reformat(nvcv_tensor, "NHWC")
     nvcv_nhwc_rgb = cvcuda.cvtcolor(nvcv_nhwc, cvcuda.ColorConversion.YUV2RGB_NV12)

@@ -56,21 +56,21 @@ def GPUDataLoader(
     dataset: torch.utils.data.Dataset,
     batch_size: int,
     shuffle: bool = False,
-    sampler: torch.utils.data.Sampler = None,
-    batch_sampler: torch.utils.data.BatchSampler = None,
-    num_workers: int = None,
-    collate_fn: Callable = None,
-    pin_memory: bool = None,
+    sampler: torch.utils.data.Sampler | None = None,
+    batch_sampler: torch.utils.data.BatchSampler | None = None,
+    num_workers: int | None = None,
+    collate_fn: Callable | None = None,
+    pin_memory: bool | None = None,
     drop_last: bool = False,
     timeout: float = 0,
-    worker_init_fn: Callable = None,
+    worker_init_fn: Callable | None = None,
     *,
-    prefetch_factor: int = None,
+    prefetch_factor: int | None = None,
     persistent_workers: bool = False,
     gpu_device: int = 0,
     gpu_prefetch_factor: int = 1,
     gpu_num_threads: int = 1,
-    gpu_transforms: List[Transform] = None,
+    gpu_transforms: List[Transform] | None = None,
 ):
     """Initialize a DataLoader.
 
@@ -107,7 +107,7 @@ def GPUDataLoader(
     node = tn.ParallelMapper(
         node,
         map_fn=map_and_collate,
-        num_workers=num_workers,
+        num_workers=num_workers or 0,
         method="process",
         multiprocessing_context="spawn",
         in_order=True,
@@ -121,7 +121,7 @@ def GPUDataLoader(
 
     node = tn.ParallelMapper(
         node,
-        map_fn=ApplyGPUTransforms(gpu_transforms, gpu_device),
+        map_fn=ApplyGPUTransforms(gpu_transforms or [], gpu_device),
         num_workers=gpu_num_threads,
         method="thread",
         in_order=True,

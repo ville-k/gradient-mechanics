@@ -19,7 +19,7 @@ class GPUIterator:
         gpu_device: int,
         gpu_prefetch_factor: int = 1,
         num_threads: int = 1,
-        transforms: List[Transform] = None,
+        transforms: List[Transform] | None = None,
     ):
         """Initialize a GPUIterator.
 
